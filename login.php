@@ -13,7 +13,7 @@ require("connect.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="css/style.css?v=3">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>Login</title>
     <style>
@@ -71,10 +71,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
-        if (password_verify($_POST['password'], $row['password'])) {
+        if ($_POST['password']== $row['password']) {   //(password_verify($_POST['password'], $row['password'])) {
             $_SESSION['user_id'] = $row['id'];
             header("Location: dashboard.php");
-        } else echo "รหัสผ่านไม่ถูกต้อง";
+        } else echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "รหัสผ่านไม่ถูกต้อง!",
+            confirmButtonText: "ลองใหม่"
+        }).then(() => {
+            window.history.back(); // กลับไปหน้าเดิม
+        });
+    </script>
+';
     } else echo "ไม่พบชื่อผู้ใช้";
 }
 
