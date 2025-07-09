@@ -1,10 +1,24 @@
-<?php require("connect.php"); ?>
+<?php 
+require("connect.php"); 
+?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Forgot Password</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
+    <style>
+    body {
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    </style>
 </head>
 <body>
 <div class="wrapper">
@@ -18,7 +32,10 @@
         </div>
         <button type="submit" class="btn">Reset Password</button>
         <div class="register-link">
-            <a href="login.php">Back to Login</a>
+            <p>
+                Remember your password?
+                <a href="login.php">Back to Login</a>
+            </p>
         </div>
     </form>
 </div>
@@ -26,7 +43,7 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
-    $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+    $new_password = $_POST['new_password']; //password_hash($_POST['new_password'], PASSWORD_DEFAULT);
 
     // ตรวจสอบว่ามี username นี้หรือไม่
     $check = $conn->prepare("SELECT * FROM users WHERE username = ?");
@@ -39,7 +56,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $update = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
         $update->bind_param("ss", $new_password, $username);
         if ($update->execute()) {
-            echo "<p style='color:green;'>เปลี่ยนรหัสผ่านเรียบร้อย <a href='login.php'>Login</a></p>";
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                        icon: "success",
+                        title: "เปลี่ยนรหัสผ่านเรียบร้อย",
+                        text: "คลิก OK เพื่อไปหน้า Login",
+                        confirmButtonText: "ไปหน้า Login"
+                        }).then(() => {
+                         window.location.href = "login.php";
+                        });
+                    </script>
+                  ';             //echo "<p style='color:green;'>เปลี่ยนรหัสผ่านเรียบร้อย <a href='login.php'>Login</a></p>";
         } else {
             echo "<p style='color:red;'>เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน</p>";
         }
@@ -48,5 +77,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 </body>
 </html>
